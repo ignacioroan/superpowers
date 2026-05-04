@@ -100,10 +100,27 @@ cd "$path"
 
 ### 3. Run Project Setup
 
-Auto-detect and run appropriate setup:
+**Security gate — BEFORE running any installer:**
+
+Package installers execute arbitrary code from the repo and its dependencies
+(npm `preinstall`/`postinstall` hooks, `pyproject.toml` build backends,
+`Cargo.toml` `build.rs`, `go generate`). A hostile or compromised repo will
+execute code the moment you run the commands below.
+
+Before proceeding:
+
+1. Inspect `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` for
+   suspicious `scripts`, `build`, or postinstall entries.
+2. If the repo is not fully trusted, prefer the flags that disable lifecycle
+   scripts (`npm ci --ignore-scripts`, `pnpm install --ignore-scripts`,
+   `yarn install --ignore-scripts`). For Python, install inside a fresh
+   virtualenv or a sandboxed environment.
+3. When in doubt, ask the user for explicit permission before installing.
+
+Auto-detect and run appropriate setup (trusted repos):
 
 ```bash
-# Node.js
+# Node.js — use --ignore-scripts if repo is untrusted
 if [ -f package.json ]; then npm install; fi
 
 # Rust

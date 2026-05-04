@@ -1,5 +1,14 @@
 # Skill authoring best practices
 
+> **Local policy note (this repo):** This document reflects Anthropic's
+> published guidance on Skills, which in places encourages shipping
+> executable scripts alongside `SKILL.md`. The local policy of this
+> repository is **Markdown-only skills**: do NOT create `.sh`, `.js`,
+> `.ts`, `.py`, `.dot`, or any other executable/parseable files inside
+> `skills/`. When this guide suggests "utility scripts can be executed
+> via bash", treat that as inapplicable here — embed the snippet as a
+> fenced code block the user pastes into their own shell instead.
+
 > Learn how to write effective Skills that Claude can discover and use successfully.
 
 Good Skills are concise, well-structured, and tested with real usage. This guide provides practical authoring decisions to help you write Skills that Claude can discover and use effectively.

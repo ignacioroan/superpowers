@@ -88,11 +88,23 @@ Then: Cleanup worktree (Step 5)
 
 #### Option 2: Push and Create PR
 
+**Confirmation gate — REQUIRED before running any of the commands below:**
+
+Pushing and opening a PR are externally-visible, hard-to-reverse actions.
+Before executing them, restate to the user:
+
+- The exact branch name and remote (`origin/<feature-branch>`)
+- That a public PR will be created against the default branch
+- The PR title and body you plan to submit
+
+Then wait for explicit user approval (a clear "yes" / "go ahead"). Do NOT
+treat silence, emojis, or your own continuation as consent.
+
 ```bash
-# Push branch
+# Push branch (only after user approval above)
 git push -u origin <feature-branch>
 
-# Create PR
+# Create PR (only after user approval above)
 gh pr create --title "<title>" --body "$(cat <<'EOF'
 ## Summary
 <2-3 bullets of what changed>

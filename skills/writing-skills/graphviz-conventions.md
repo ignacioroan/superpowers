@@ -1,3 +1,14 @@
+# Graphviz Style Guide (DSL conventions)
+
+These are the graphviz conventions used by flowcharts in skills. The style
+guide is itself written as a graphviz diagram: each `subgraph cluster_*`
+below demonstrates one category of convention (node shapes, edge labels,
+naming, structure templates, shape-picking rules, good-vs-bad examples).
+
+Read the comments in the `dot` block; the *contents* of the diagram are
+the rules.
+
+```dot
 digraph STYLE_GUIDE {
     // The style guide for our process DSL, written in the DSL itself
 
@@ -170,3 +181,4 @@ digraph STYLE_GUIDE {
         bad_3 -> bad_4;
     }
 }
+```

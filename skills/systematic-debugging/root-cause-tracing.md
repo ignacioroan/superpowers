@@ -96,15 +96,79 @@ npm test 2>&1 | grep 'DEBUG git init'
 
 ## Finding Which Test Causes Pollution
 
-If something appears during tests but you don't know which test:
+If something appears during tests but you don't know which test, run tests one-by-one and check whether the pollution artifact appears after each one. This skill intentionally ships no executable scripts — copy the snippet below into a throwaway shell session (do not commit it to the repo), review it, then run it.
 
-Use the bisection script `find-polluter.sh` in this directory:
+**Usage after you paste it into your own terminal:**
 
 ```bash
-./find-polluter.sh '.git' 'src/**/*.test.ts'
+# Pass a real directory and a real filename glob. Do NOT use a shell glob
+# like 'src/**/*.test.ts' as the pattern — find's -path is a literal path
+# matcher, not a shell glob, and will silently match nothing.
+find_polluter '.git' src tests -- '*.test.ts'
 ```
 
-Runs tests one-by-one, stops at first polluter. See script for usage.
+**Reference snippet (paste into your shell; do not add as a repo file):**
+
+```bash
+find_polluter() {
+  # Usage: find_polluter <pollution_path> <search_dir> [<search_dir>...] -- <name_glob>
+  #
+  # pollution_path : file or dir whose appearance marks a polluting test
+  # search_dir(s)  : directories to scan (DO NOT include node_modules)
+  # name_glob      : filename glob after --, e.g. '*.test.ts'
+  local pollution_check="$1"; shift || true
+  local -a dirs=()
+  while [ $# -gt 0 ] && [ "$1" != "--" ]; do
+    dirs+=("$1"); shift
+  done
+  if [ "$1" != "--" ] || [ -z "$2" ] || [ -z "$pollution_check" ] || [ ${#dirs[@]} -eq 0 ]; then
+    echo "Usage: find_polluter <pollution_path> <dir> [<dir>...] -- <name_glob>"
+    return 1
+  fi
+  shift
+  local name_glob="$1"
+
+  echo "Searching for test that creates: $pollution_check"
+  echo "Scanning: ${dirs[*]}  (glob: $name_glob)"
+
+  # Safety: refuse to scan node_modules / vendor / .git, which can execute
+  # arbitrary third-party code through their test files.
+  local -a test_files=()
+  while IFS= read -r -d '' f; do
+    case "$f" in
+      */node_modules/*|*/.git/*|*/vendor/*|*/dist/*|*/build/*) continue ;;
+    esac
+    test_files+=("$f")
+  done < <(find "${dirs[@]}" -type f -name "$name_glob" -print0 | sort -z)
+
+  local total=${#test_files[@]}
+  echo "Found $total test files"
+
+  local count=0
+  for test_file in "${test_files[@]}"; do
+    count=$((count + 1))
+
+    if [ -e "$pollution_check" ]; then
+      echo "Pollution already exists before test $count/$total — skipping $test_file"
+      continue
+    fi
+
+    echo "[$count/$total] $test_file"
+    npm test -- "$test_file" >/dev/null 2>&1 || true
+
+    if [ -e "$pollution_check" ]; then
+      echo "FOUND POLLUTER: $test_file created $pollution_check"
+      ls -la "$pollution_check"
+      return 0
+    fi
+  done
+
+  echo "No polluter found"
+  return 0
+}
+```
+
+**Why not ship it as a script?** Executable files in a skill directory widen the attack surface (accidental execution, tampering, path-based injection). Keeping it as documented code the user pastes themselves keeps the skill to Markdown only. **Also:** never point the scanner at `node_modules/` or any vendored third-party source — running their test files executes their code.
 
 ## Real Example: Empty projectDir
 

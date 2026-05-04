@@ -87,16 +87,22 @@ You MUST complete each phase before proceeding to the next.
    ```
 
    **Example (multi-layer system):**
+
+   **NEVER print secret values.** Only print presence (SET/UNSET) and, if
+   essential for debugging, length. Redact anything that could be a
+   credential, token, key, identity, or signing material.
+
    ```bash
-   # Layer 1: Workflow
+   # Layer 1: Workflow — presence only, never the value
    echo "=== Secrets available in workflow: ==="
-   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
+   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET} (len=${#IDENTITY})"
 
-   # Layer 2: Build script
-   echo "=== Env vars in build script: ==="
-   env | grep IDENTITY || echo "IDENTITY not in environment"
+   # Layer 2: Build script — list variable NAMES only, not values
+   echo "=== Env var names matching IDENTITY: ==="
+   env | awk -F= '/^IDENTITY/ {print $1 "=<redacted>"}' \
+     || echo "IDENTITY not in environment"
 
-   # Layer 3: Signing script
+   # Layer 3: Keychain state — safe, prints identifiers not secret material
    echo "=== Keychain state: ==="
    security list-keychains
    security find-identity -v

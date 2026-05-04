@@ -313,13 +313,40 @@ digraph when_flowchart {
 - Linear instructions → Numbered lists
 - Labels without semantic meaning (step1, helper2)
 
-See @graphviz-conventions.dot for graphviz style rules.
+See @graphviz-conventions.md for graphviz style rules.
 
-**Visualizing for your human partner:** Use `render-graphs.js` in this directory to render a skill's flowcharts to SVG:
+**Visualizing for your human partner:** This skill ships no executable renderer — only Markdown. To render a skill's ```dot blocks to SVG, use `graphviz` (`dot`) directly from your own shell. The one-liner below extracts every ```dot block from a `SKILL.md` and pipes each into `dot`. Review it, then paste it into your terminal; do not commit it as a repo script.
+
 ```bash
-./render-graphs.js ../some-skill           # Each diagram separately
-./render-graphs.js ../some-skill --combine # All diagrams in one SVG
+# Renders every ```dot block in <skill>/SKILL.md to <skill>/diagrams/*.svg
+render_skill_graphs() {
+  local skill_dir="${1:?usage: render_skill_graphs <skill-dir>}"
+  local skill_file="$skill_dir/SKILL.md"
+  local out_dir="$skill_dir/diagrams"
+  command -v dot >/dev/null || { echo "install graphviz (brew install graphviz)"; return 1; }
+  [ -f "$skill_file" ] || { echo "not found: $skill_file"; return 1; }
+  mkdir -p "$out_dir"
+
+  awk '
+    /^```dot[[:space:]]*$/ { in_block=1; block=""; next }
+    /^```[[:space:]]*$/ && in_block { in_block=0; print block "\0"; next }
+    in_block { block = block $0 "\n" }
+  ' "$skill_file" | while IFS= read -r -d "" block; do
+    # Extract digraph name with a POSIX-compatible pipeline (works on macOS BSD awk).
+    raw_name=$(printf "%s" "$block" \
+      | grep -Eo 'digraph[[:space:]]+[A-Za-z_][A-Za-z0-9_]*' \
+      | head -1 \
+      | awk '{print $2}')
+    # Hard-sanitize: strip any path separators and non-word characters as defense in depth.
+    safe_name=$(printf "%s" "$raw_name" | tr -cd 'A-Za-z0-9_')
+    [ -z "$safe_name" ] && safe_name="graph_$RANDOM"
+    out_file="$out_dir/$(basename "$safe_name").svg"
+    printf "%s" "$block" | dot -Tsvg > "$out_file" && echo "rendered $out_file"
+  done
+}
 ```
+
+**Why a paste-in snippet and not a repo script?** Keeping the skill to Markdown-only removes the attack surface of executable files (accidental execution, path-based injection, tampering). If you need a reusable renderer, save this function in your own shell profile, not in the skill directory.
 
 ## Code Examples
 
