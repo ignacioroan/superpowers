@@ -26,30 +26,6 @@ In-scope follow-ups extend the plan. **Core principle:** write an explicit itera
 
 ## Process
 
-```dot
-digraph iterating_on_implementation {
-    "Locate spec + plan" [shape=box];
-    "Understand change" [shape=box];
-    "In scope?" [shape=diamond];
-    "Redirect to brainstorming" [shape=box];
-    "Bug cause unclear?" [shape=diamond];
-    "Use systematic-debugging first" [shape=box];
-    "Write Iteration N section" [shape=box];
-    "Execute via subagent-driven-development / executing-plans" [shape=box];
-    "verification-before-completion" [shape=doublecircle];
-
-    "Locate spec + plan" -> "Understand change";
-    "Understand change" -> "In scope?";
-    "In scope?" -> "Redirect to brainstorming" [label="no"];
-    "In scope?" -> "Bug cause unclear?" [label="yes"];
-    "Bug cause unclear?" -> "Use systematic-debugging first" [label="yes"];
-    "Use systematic-debugging first" -> "Write Iteration N section" [label="known"];
-    "Bug cause unclear?" -> "Write Iteration N section" [label="no"];
-    "Write Iteration N section" -> "Execute via subagent-driven-development / executing-plans";
-    "Execute via subagent-driven-development / executing-plans" -> "verification-before-completion";
-}
-```
-
 1. Read the current spec and plan.
 2. State the change and out-of-scope areas.
 3. Scope check is mandatory: if scope expands, redirect to `brainstorming`.
