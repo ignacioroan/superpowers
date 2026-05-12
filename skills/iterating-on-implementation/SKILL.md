@@ -26,7 +26,7 @@ In-scope follow-ups extend the plan. **Core principle:** write an explicit itera
 
 ## Process
 
-1. Read the current spec and plan.
+1. **Find and read the current spec and plan.** Search the repo first — look in `docs/plans/`, `docs/`, and the project root for a file matching the feature or ticket name. Only fall back to the session workspace if nothing is found in the repo.
 2. State the change and out-of-scope areas.
 3. Scope check is mandatory: if scope expands, redirect to `brainstorming`.
 4. For unclear bugs, use `systematic-debugging` first.
@@ -88,3 +88,4 @@ git commit -m "fix: [description]"
 | Skipping the scope check entirely | Make scope explicit before proceeding. |
 | Writing a vague follow-up plan/addendum | Append `## Iteration N` with Trigger, Scope, Goal, and steps. |
 | Not delegating to execution skills | Hand execution to `subagent-driven-development` or `executing-plans`. |
+| Creating a new plan file without searching first | Search `docs/plans/`, `docs/`, and the project root before creating anything. The plan likely already exists in the repo. |
