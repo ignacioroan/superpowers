@@ -32,6 +32,7 @@ In-scope follow-ups extend the plan. **Core principle:** write an explicit itera
 4. For unclear bugs, use `systematic-debugging` first.
 5. Append `Iteration N` to the plan.
 6. Execute via `subagent-driven-development` or `executing-plans`, then use `verification-before-completion`.
+7. **Always run typecheck + linter after any code change.** Run tests too unless the change is purely removing dead code or unused props with no logic impact — document that decision explicitly if skipping tests.
 
 ## Iteration Section Format
 
