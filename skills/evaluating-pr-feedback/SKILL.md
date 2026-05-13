@@ -50,7 +50,7 @@ Always show the score breakdown before acting on the decision:
 Gain: N | Plausibility: N | Cost: N | Total: N/9
 ```
 
-**Sum ≥ 7 → Act.** Invoke `iterating-on-implementation`.
+**Sum ≥ 7 → Worth acting.** Present the score breakdown and your conclusion to the human, then ask whether to proceed. Only invoke `iterating-on-implementation` if the human confirms.
 
 **Sum < 7 → Don't act.** Draft a rejection reply and output it to chat. Do NOT post to GitHub.
 
