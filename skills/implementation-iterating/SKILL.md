@@ -1,5 +1,5 @@
 ---
-name: iterating-on-implementation
+name: implementation-iterating
 description: Use when implemented work needs an in-scope bug fix or small addition within the existing plan, especially if the request is drifting toward vague addenda or unnecessary brainstorming.
 ---
 
@@ -9,7 +9,7 @@ description: Use when implemented work needs an in-scope bug fix or small additi
 
 In-scope follow-ups extend the plan. **Core principle:** write an explicit iteration, then delegate execution.
 
-**Announce at start:** "I'm using iterating-on-implementation for an in-scope iteration."
+**Announce at start:** "I'm using implementation-iterating for an in-scope iteration."
 
 ## When to Use
 

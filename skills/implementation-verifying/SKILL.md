@@ -1,5 +1,5 @@
 ---
-name: verifying-implementation
+name: implementation-verifying
 description: Use when a feature implementation is complete and needs to be checked against the original ticket, Figma design, and design system before closing or raising a PR
 ---
 
@@ -11,7 +11,7 @@ Cross-check the delivered implementation against Jira ACs, Figma anatomy/guideli
 
 **Core principle:** No verification without all three sources. No output without a plan file or explicit user confirmation that none exists.
 
-**Announce at start:** "I'm using verifying-implementation to check this feature."
+**Announce at start:** "I'm using implementation-verifying to check this feature."
 
 ## Prerequisites — stop and ask if any source is missing
 

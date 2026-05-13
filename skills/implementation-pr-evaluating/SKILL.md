@@ -1,5 +1,5 @@
 ---
-name: evaluating-pr-feedback
+name: implementation-pr-evaluating
 description: Use when receiving a PR comment that needs a triage decision — whether to act on it or dismiss it with a reply
 ---
 
@@ -7,11 +7,11 @@ description: Use when receiving a PR comment that needs a triage decision — wh
 
 ## Overview
 
-Not every PR comment deserves action. This skill scores a comment on three dimensions and decides in one of two directions: draft a rejection reply (output to chat only), or hand off to `iterating-on-implementation`.
+Not every PR comment deserves action. This skill scores a comment on three dimensions and decides in one of two directions: draft a rejection reply (output to chat only), or hand off to `implementation-iterating`.
 
 **Core principle:** Score first, then decide. Never implement blindly.
 
-**Announce at start:** "I'm using evaluating-pr-feedback to triage this comment."
+**Announce at start:** "I'm using implementation-pr-evaluating to triage this comment."
 
 ## Input
 
@@ -50,7 +50,7 @@ Always show the score breakdown before acting on the decision:
 Gain: N | Plausibility: N | Cost: N | Total: N/9
 ```
 
-**Sum ≥ 7 → Worth acting.** Present the score breakdown and your conclusion to the human, then ask whether to proceed. Only invoke `iterating-on-implementation` if the human confirms.
+**Sum ≥ 7 → Worth acting.** Present the score breakdown and your conclusion to the human, then ask whether to proceed. Only invoke `implementation-iterating` if the human confirms.
 
 **Sum < 7 → Don't act.** Draft a rejection reply and output it to chat. Do NOT post to GitHub.
 
