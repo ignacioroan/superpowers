@@ -1,6 +1,6 @@
 ---
 name: implementation-iterating
-description: Use when implemented work needs an in-scope bug fix or small addition within the existing plan, especially if the request is drifting toward vague addenda or unnecessary brainstorming.
+description: Only use when your human partner explicitly asks you to use this skill. Do not auto-invoke.
 ---
 
 # Iterating on Implementation
