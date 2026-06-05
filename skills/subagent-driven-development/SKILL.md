@@ -5,13 +5,27 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
+Execute plan by dispatching a fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review. After each completed task, pause and wait for your human partner's explicit authorization before starting the next one unless they clearly asked for uninterrupted execution.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
+**Core principle:** Fresh subagent per task + two-stage review (spec then quality) + explicit human authorization between tasks = high quality without silent drift
 
-**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+## Mandatory Execution Rule
+
+Every task ends with a mandatory pause unless your human partner explicitly asked you to do the full run without stopping.
+
+- After completing a task, stop.
+- Report which task was completed using its ordinal position within the current plan when that structure exists, for example `Completed Task 2 of 4: Recovery modes`.
+- If the current work does not have explicitly numbered tasks, report by descriptive name only with no invented numbers, for example `Completed: Update docs wording` and `Next: Run verification`.
+- If another task remains, identify the next task by ordinal and name when the current plan is explicitly numbered. Otherwise, identify it by descriptive name only. In both cases, briefly state what it covers.
+- If the completed task is the last task, provide a concise summary of the work completed across the full task list.
+- Before considering a task complete, review any worktrees you used and leave them in an intentional state. Remove only worktrees you created and own. If a worktree is host-managed or should be preserved, still ensure you are not unintentionally keeping a branch alive.
+- Wait for explicit user authorization before starting the next task or wrap-up step.
+
+This pause is mandatory even if the next step seems obvious.
+
+**Exception:** Skip the pause only when your human partner explicitly asks for uninterrupted execution, for example "do the whole plan in one pass" or "finish all remaining tasks without stopping." Vague encouragement is not enough.
 
 ## When to Use
 
@@ -37,7 +51,7 @@ digraph when_to_use {
 - Same session (no context switch)
 - Fresh subagent per task (no context pollution)
 - Two-stage review after each task: spec compliance first, then code quality
-- Faster iteration (no human-in-loop between tasks)
+- Human approval checkpoint between tasks by default
 
 ## The Process
 
@@ -58,10 +72,15 @@ digraph process {
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
         "Mark task complete in TodoWrite" [shape=box];
+        "Report completion, next task, and wait" [shape=box];
+        "Report final summary and wait" [shape=box];
     }
 
     "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
     "More tasks remain?" [shape=diamond];
+    "Human partner authorizes next task?" [shape=diamond];
+    "Human partner authorizes wrap-up?" [shape=diamond];
+    "Pause and wait" [shape=box];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
     "Use superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
@@ -80,8 +99,15 @@ digraph process {
     "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
     "Code quality reviewer subagent approves?" -> "Mark task complete in TodoWrite" [label="yes"];
     "Mark task complete in TodoWrite" -> "More tasks remain?";
-    "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
-    "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
+    "More tasks remain?" -> "Report completion, next task, and wait" [label="yes"];
+    "Report completion, next task, and wait" -> "Human partner authorizes next task?";
+    "Human partner authorizes next task?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
+    "Human partner authorizes next task?" -> "Pause and wait" [label="no"];
+    "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no, uninterrupted run"];
+    "More tasks remain?" -> "Report final summary and wait" [label="no, default pause"];
+    "Report final summary and wait" -> "Human partner authorizes wrap-up?";
+    "Human partner authorizes wrap-up?" -> "Dispatch final code reviewer subagent for entire implementation" [label="yes"];
+    "Human partner authorizes wrap-up?" -> "Pause and wait" [label="no"];
     "Dispatch final code reviewer subagent for entire implementation" -> "Use superpowers:finishing-a-development-branch";
 }
 ```
@@ -158,6 +184,12 @@ Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
 
 [Mark Task 1 complete]
 
+You: Completed Task 1 of 5: Hook installation script.
+Next: Task 2 of 5: Recovery modes - adds verify/repair modes and any missing progress behavior.
+Waiting for your go-ahead before I start Task 2.
+
+your human partner: Continue
+
 Task 2: Recovery modes
 
 [Get Task 2 text and context (already extracted)]
@@ -192,8 +224,18 @@ Code reviewer: ✅ Approved
 
 [Mark Task 2 complete]
 
+You: Completed Task 2 of 5: Recovery modes.
+Next: Task 3 of 5: ...
+Waiting for your go-ahead before I start Task 3.
+
 ...
 
+[If Task 5 was the last task and you are using the default pause behavior]
+You: Completed Task 5 of 5: ...
+Summary: Tasks 1-5 are complete, reviewed, and ready for final wrap-up.
+Waiting for your go-ahead before I start final review and branch-finishing steps.
+
+[If your human partner explicitly asked for uninterrupted execution]
 [After all tasks]
 [Dispatch final code-reviewer]
 Final reviewer: All requirements met, ready to merge
@@ -211,7 +253,7 @@ Done!
 
 **vs. Executing Plans:**
 - Same session (no handoff)
-- Continuous progress (no waiting)
+- Human-visible checkpoints between tasks
 - Review checkpoints automatic
 
 **Efficiency gains:**
@@ -231,6 +273,7 @@ Done!
 - More subagent invocations (implementer + 2 reviewers per task)
 - Controller does more prep work (extracting all tasks upfront)
 - Review loops add iterations
+- Pauses between tasks can slow total throughput
 - But catches issues early (cheaper than debugging later)
 
 ## Red Flags
@@ -248,6 +291,8 @@ Done!
 - Let implementer self-review replace actual review (both are needed)
 - **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
+- Start the next task or wrap-up step without explicit authorization unless your human partner clearly requested uninterrupted execution
+- Treat vague encouragement as permission to skip the pause
 
 **If subagent asks questions:**
 - Answer clearly and completely

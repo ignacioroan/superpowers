@@ -7,11 +7,27 @@ description: Use when you have a written implementation plan to execute in a sep
 
 ## Overview
 
-Load plan, review critically, execute all tasks, report when complete.
+Load plan, review critically, execute one task at a time, and pause for explicit human authorization before continuing unless your human partner clearly asked for an uninterrupted run.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
 **Note:** Tell your human partner that Superpowers works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Claude Code or Codex). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
+
+## Mandatory Execution Rule
+
+Every task ends with a mandatory pause unless your human partner explicitly asked you to do the full run without stopping.
+
+- After completing a task, stop.
+- Report which task was completed using its ordinal position within the current plan when that structure exists, for example `Completed Task 2 of 4: Rename CLI command`.
+- If the current work does not have explicitly numbered tasks, report by descriptive name only with no invented numbers, for example `Completed: Update docs wording` and `Next: Run verification`.
+- If another task remains, identify the next task by ordinal and name when the current plan is explicitly numbered. Otherwise, identify it by descriptive name only. In both cases, briefly state what it covers.
+- If the completed task is the last task, provide a concise summary of the work completed across the full task list.
+- Before considering a task complete, review any worktrees you used and leave them in an intentional state. Remove only worktrees you created and own. If a worktree is host-managed or should be preserved, still ensure you are not unintentionally keeping a branch alive.
+- Wait for explicit user authorization before starting the next task or wrap-up step.
+
+This pause is mandatory even if the next step seems obvious.
+
+**Exception:** Skip the pause only when your human partner explicitly asks for uninterrupted execution, for example "do the whole plan in one pass" or "finish all remaining tasks without stopping." Vague encouragement is not enough.
 
 ## The Process
 
@@ -28,10 +44,12 @@ For each task:
 2. Follow each step exactly (plan has bite-sized steps)
 3. Run verifications as specified
 4. Mark as completed
+5. If more tasks remain, report completion plus the next task and wait for explicit authorization before proceeding
+6. If this was the last task, report a concise full-plan summary and wait for explicit authorization before Step 3 unless the user explicitly requested uninterrupted execution
 
 ### Step 3: Complete Development
 
-After all tasks complete and verified:
+After all tasks complete and verified, and after any required authorization pause:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
@@ -60,6 +78,8 @@ After all tasks complete and verified:
 - Don't skip verifications
 - Reference skills when plan says to
 - Stop when blocked, don't guess
+- Pause after each completed task unless your human partner explicitly requested uninterrupted execution
+- Treat vague encouragement as insufficient to skip the pause
 - Never start implementation on main/master branch without explicit user consent
 
 ## Integration
