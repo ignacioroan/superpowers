@@ -2,6 +2,14 @@
 
 Fork-specific changes tracked here to make future upstream syncs easier to review.
 
+## 2026-06-25
+
+- Adopted the upstream v6 subagent-driven-development rework: single task reviewer, file handoffs via `.superpowers/sdd/` workspace, progress ledger, new `task-reviewer-prompt.md` replacing the two separate spec/quality reviewers.
+- Re-applied the fork's pause-by-default rule on the new v6 execution loop: mandatory pause after each task, uninterrupted runs only when human partner explicitly requests them.
+- Added a plan-sync rule to `subagent-driven-development/SKILL.md` and `executing-plans/SKILL.md`: when execution diverges from the plan (bug forces a redesign, review changes a decision), the agent updates the plan file before marking the task complete or continuing.
+- Adopted upstream v6 `writing-skills` additions (form-to-failure table, micro-test wording section, two new checklist items) and `writing-plans` additions (task right-sizing, global constraints section, interfaces block in task template).
+- Applied small correctness fixes from upstream v6: `systematic-debugging` keyword in `using-superpowers`, markdown link fix in `test-driven-development`, hyphen fix in `systematic-debugging`.
+
 ## 2026-06-05
 
 - Added this changelog to record dated changes made in the fork.
