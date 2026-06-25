@@ -23,6 +23,9 @@ Every task ends with a mandatory pause unless your human partner explicitly aske
 - If another task remains, identify the next task by ordinal and name when the current plan is explicitly numbered. Otherwise, identify it by descriptive name only. In both cases, briefly state what it covers.
 - If the completed task is the last task, provide a concise summary of the work completed across the full task list.
 - Before considering a task complete, review any worktrees you used and leave them in an intentional state. Remove only worktrees you created and own. If a worktree is host-managed or should be preserved, still ensure you are not unintentionally keeping a branch alive.
+- **Sync the plan at each checkpoint.** If execution diverged from the plan,
+  update the plan (and spec if affected) before continuing. The plan must always
+  describe what was actually built.
 - Wait for explicit user authorization before starting the next task or wrap-up step.
 
 This pause is mandatory even if the next step seems obvious.

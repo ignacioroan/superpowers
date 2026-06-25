@@ -2,6 +2,33 @@
 
 Fork-specific changes tracked here to make future upstream syncs easier to review.
 
+## 2026-06-25 — Upstream v6.0.3 sync
+
+Selective, manual port of the mother project's `v6.0.3` into the fork. Plan and
+rationale: `docs/plans/2026-06-25-upstream-v6-sync.md` and
+`docs/specs/2026-06-25-upstream-v6-sync-design.md`.
+
+**Subagent-Driven Development (Tier 2):**
+
+- Adopted the upstream v6 SDD rework: a single `task-reviewer-prompt.md` (spec + quality in one pass) replacing the separate `spec-reviewer-prompt.md` and `code-quality-reviewer-prompt.md`; file handoffs and a progress ledger in a self-ignoring working-tree `.superpowers/sdd/` workspace (the v6.0.3 fix that keeps artifacts out of the protected `.git/` path) via new `scripts/task-brief`, `scripts/review-package`, and `scripts/sdd-workspace`; pre-flight plan review; explicit per-dispatch model selection.
+- **Re-applied the fork's pause-by-default rule on the new v6 execution loop** (RED/GREEN validated): mandatory pause after each task, with uninterrupted runs only when the human partner explicitly asks. This re-inverts upstream's "continuous execution".
+- Added a **plan-sync** rule to `subagent-driven-development` and `executing-plans`: when execution diverges from the plan (a bug forces a redesign, a review changes a decision), the agent updates the plan file before marking the task complete or continuing.
+
+**Skill-authoring improvements (Tier 1):**
+
+- `writing-skills`: added the "Match the Form to the Failure" table and the "Micro-Test Wording" section, plus two new checklist items (the fork's CSO naming and `references/` set were intentionally kept — no wholesale vendor-neutral rewrite).
+- `writing-plans`: added Task Right-Sizing, a Global Constraints template block, and a per-task Interfaces block.
+- Correctness fixes: `systematic-debugging` "Ultrathink"→"Ultra-think" (stops forcing extended thinking); `test-driven-development` `@`-link → markdown link; `using-superpowers` bootstrap now names `systematic-debugging` instead of the nonexistent `debugging` skill.
+
+**Security-sensitive merges (Tier 3) — fork hardening preserved:**
+
+- `using-git-worktrees`: adopted v6 step renumbering and dropped the legacy `~/.config/superpowers/worktrees/` global path; **kept the installer security gate**.
+- `finishing-a-development-branch`: made PR creation forge-neutral (removed the hardcoded `gh pr create` block) and dropped the legacy global worktree path; **kept the push/PR confirmation gate**.
+- `requesting-code-review/code-reviewer.md`: adopted the v6 placeholder (`{}`→`[]`) and read-only/skeptical-reviewer wording (used by the v6 SDD final review); **kept the Untrusted Input Warning**.
+- `hooks/session-start`: adopted the v6 Windows EPIPE robustness (`printf … | cat`); **kept the fork's `escape_for_json` and Copilot/OpenCode platform detection**.
+
+**Deliberately NOT adopted** (contradict the fork's vision or out of scope): the brainstorming visual-companion server and its v6 auth hardening (the fork removed the server for security); all Codex artifacts; the evals submodule + "drill"; the Kimi/Pi/Antigravity harnesses; the README/PR/issue-template/governance changes; the shell-lint + pre-commit tooling.
+
 ## 2026-06-05
 
 - Added this changelog to record dated changes made in the fork.
