@@ -14,7 +14,21 @@ Execute plan by dispatching a fresh implementer subagent per task, a task review
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
 
-**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+## Mandatory Execution Rule
+
+Every task ends with a mandatory pause unless your human partner explicitly asked you to do the full run without stopping.
+
+- After completing a task, stop.
+- Report which task was completed using its ordinal position within the current plan when that structure exists, for example `Completed Task 2 of 4: Recovery modes`.
+- If the current work does not have explicitly numbered tasks, report by descriptive name only with no invented numbers, for example `Completed: Update docs wording` and `Next: Run verification`.
+- If another task remains, identify the next task by ordinal and name when the current plan is explicitly numbered. Otherwise, identify it by descriptive name only. In both cases, briefly state what it covers.
+- If the completed task is the last task, provide a concise summary of the work completed across the full task list.
+- Before considering a task complete, review any worktrees you used and leave them in an intentional state. Remove only worktrees you created and own. If a worktree is host-managed or should be preserved, still ensure you are not unintentionally keeping a branch alive.
+- Wait for explicit user authorization before starting the next task or wrap-up step.
+
+This pause is mandatory even if the next step seems obvious.
+
+**Exception:** Skip the pause only when your human partner explicitly asks for uninterrupted execution, for example "do the whole plan in one pass" or "finish all remaining tasks without stopping." Vague encouragement is not enough.
 
 ## When to Use
 
@@ -40,7 +54,7 @@ digraph when_to_use {
 - Same session (no context switch)
 - Fresh subagent per task (no context pollution)
 - Review after each task (spec compliance + code quality), broad review at the end
-- Faster iteration (no human-in-loop between tasks)
+- Human approval checkpoint between tasks by default
 
 ## The Process
 
@@ -64,6 +78,11 @@ digraph process {
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" [shape=box];
     "Use superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+    "Report completion, next task, and wait" [shape=box];
+    "Report final summary and wait" [shape=box];
+    "Human partner authorizes next task?" [shape=diamond];
+    "Human partner authorizes wrap-up?" [shape=diamond];
+    "Pause and wait" [shape=box];
 
     "Read plan, note context and global constraints, create todos" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
@@ -76,8 +95,15 @@ digraph process {
     "Dispatch fix subagent for Critical/Important findings" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" [label="re-review"];
     "Task reviewer reports spec ✅ and quality approved?" -> "Mark task complete in todo list and progress ledger" [label="yes"];
     "Mark task complete in todo list and progress ledger" -> "More tasks remain?";
-    "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
-    "More tasks remain?" -> "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" [label="no"];
+    "More tasks remain?" -> "Report completion, next task, and wait" [label="yes"];
+    "Report completion, next task, and wait" -> "Human partner authorizes next task?";
+    "Human partner authorizes next task?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
+    "Human partner authorizes next task?" -> "Pause and wait" [label="no"];
+    "More tasks remain?" -> "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" [label="no, uninterrupted run"];
+    "More tasks remain?" -> "Report final summary and wait" [label="no, default pause"];
+    "Report final summary and wait" -> "Human partner authorizes wrap-up?";
+    "Human partner authorizes wrap-up?" -> "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" [label="yes"];
+    "Human partner authorizes wrap-up?" -> "Pause and wait" [label="no"];
     "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" -> "Use superpowers:finishing-a-development-branch";
 }
 ```
@@ -342,7 +368,7 @@ Done!
 
 **vs. Executing Plans:**
 - Same session (no handoff)
-- Continuous progress (no waiting)
+- Human-visible checkpoints between tasks
 - Review checkpoints automatic
 
 **Efficiency gains:**
@@ -387,6 +413,8 @@ Done!
 - Move to next task while the review has open Critical/Important issues
 - Re-dispatch a task the progress ledger already marks complete — check
   the ledger (and `git log`) after any compaction or resume
+- Start the next task or wrap-up step without explicit authorization unless your human partner clearly requested uninterrupted execution
+- Treat vague encouragement as permission to skip the pause
 
 **If subagent asks questions:**
 - Answer clearly and completely
