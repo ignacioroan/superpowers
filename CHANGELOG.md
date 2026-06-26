@@ -2,6 +2,34 @@
 
 Fork-specific changes tracked here to make future upstream syncs easier to review.
 
+## 2026-06-26 — Feature-delivery skills
+
+Executed `docs/plans/2026-06-25-feature-delivery-improvements.md` (on the post-v6
+baseline). Skills authored/edited with the `writing-skills` method; UI behaviors
+validated against a real throwaway fixture rendered via the preview MCP.
+
+- **New skill `visual-verification`** — renders the implementation and captures a
+  viewport × state matrix, compares to the design, and traces layout defects to
+  computed styles (`failure-modes.md` reference). RED/GREEN validated: against a
+  fixture whose source reads like a row but renders as a column (mobile-first base +
+  missing desktop override), a no-skill baseline declared it shippable from source;
+  with the skill the agent caught the column-not-row defect and root-caused it.
+- **Enhanced `implementation-verifying`** — added a render step (invokes
+  `visual-verification`), a Running-UI prerequisite, an accessibility checklist, and
+  reuse-before-rebuild + layout-primitive gap-table rows. Adopted as *formalization*:
+  the planned RED baseline did not hold (a thorough agent already caught the four
+  planted defects by reading source, incl. tracing the cascade), so the value is
+  making those checks explicit/reliable across agents and adding the render step for
+  defects not deducible from source. Render behavior itself is validated at the
+  `visual-verification` level.
+- **New skill `superdeveloper`** — a thin main-thread orchestrator chaining
+  brainstorming → writing-plans → subagent-driven-development → implementation-verifying
+  → finishing-a-development-branch with explicit human gates. v6-reconciled (honors
+  SDD pause-by-default; pins only the orchestrator's model; distinguished from the
+  `using-superpowers` bootstrap). RED/GREEN validated: baseline skipped verification
+  and jumped to PR after implementation; with the skill the agent proceeds to the
+  Verify phase first.
+
 ## 2026-06-25 — Upstream v6.0.3 sync
 
 Selective, manual port of the mother project's `v6.0.3` into the fork. Plan and
