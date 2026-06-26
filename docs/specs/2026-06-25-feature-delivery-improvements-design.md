@@ -189,7 +189,7 @@ in the main thread.)
 | Intake | read the ticket / design / component-library sources into context | — |
 | Design | `brainstorming` → spec | **Human: approve spec** |
 | Plan | `writing-plans` | **Human: "go"** |
-| Implement | `subagent-driven-development` (TDD + two-stage review + plan-sync) | per-task pause (per that skill) |
+| Implement | `subagent-driven-development` (v6: TDD + single task-reviewer review + broad final review + plan-sync) | per-task pause-by-default (per that skill) |
 | Verify | `implementation-verifying` (which runs `visual-verification`) | findings fixed before proceeding |
 | Review | `receiving-code-review` on any feedback | — |
 | Finish | `finishing-a-development-branch` | **Human: PR/merge choice** |
@@ -198,7 +198,9 @@ in the main thread.)
 - **Never stall silently.** Auto-progress between phases. The ONLY stops are the
   named human gates above; emit them explicitly. Halting mid-phase without a named
   gate is a defect.
-- **Pin one model for the whole run** (no mid-run model switch).
+- **Pin the orchestrator's model** (no mid-run switch of the orchestration model);
+  let each delegated skill tier its own per-task models — SDD's Model Selection picks
+  cheap/standard/capable per task, which is a cost feature, not mid-run switching.
 - **After implementation, always proceed to verification** — never present a "done"
   summary that skips verification.
 - **Distinguish intentional gates from accidental stalls** and say which is which.

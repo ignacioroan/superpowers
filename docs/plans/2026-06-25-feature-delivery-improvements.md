@@ -10,17 +10,20 @@
 
 **Source spec:** `docs/specs/2026-06-25-feature-delivery-improvements-design.md`
 
-> **Sequencing / depends on:** the upstream-v6 sync plan
-> (`docs/plans/2026-06-25-upstream-v6-sync.md`). Execute that sync **first**; this
-> plan runs on the post-sync baseline. Two reconciliations follow from that decision:
-> - **Task 3 (plan-sync) is MOVED into the sync plan.** The sync already rewrites the
->   SDD execution loop (to bring in v6 *and* re-apply our pause-by-default), so the
->   plan-sync rule is added there, in the same edit, against the v6 structure — not
->   here.
-> - **Authoring method:** the sync upgrades `writing-skills` ("Match the Form to the
->   Failure" + "Micro-Test Wording"). When drafting the skills below, classify each
->   baseline failure first and pick recipe/contract vs prohibition accordingly. The
->   GREEN drafts here are starting points, not final wording.
+> **Baseline: the upstream-v6.0.3 sync is DONE and merged to `main`**
+> (`docs/plans/2026-06-25-upstream-v6-sync.md`). This plan runs on that baseline.
+> Carry-overs:
+> - **Task 3 (plan-sync) is DONE** — implemented in the sync; the plan-sync rule now
+>   lives in `subagent-driven-development` and `executing-plans`. The Task 3 section
+>   below is historical reference only.
+> - **SDD is now v6** — `subagent-driven-development` uses a single task-reviewer
+>   (spec + quality in one pass), a broad final review, file handoffs, a progress
+>   ledger, per-task model selection, and the fork's re-applied pause-by-default.
+>   Task 4 (`superdeveloper`) delegates to it and must stay consistent with these.
+> - **Authoring method:** `writing-skills` now carries "Match the Form to the Failure"
+>   + "Micro-Test Wording". When drafting the skills below, classify each baseline
+>   failure first, pick recipe/contract vs prohibition accordingly, and micro-test the
+>   wording. The GREEN drafts here are starting points, not final wording.
 
 ---
 
@@ -31,8 +34,8 @@
 | Create | `skills/visual-verification/SKILL.md` | Render UI + screenshot matrix (viewports × states), compare, report defects |
 | Create | `skills/visual-verification/failure-modes.md` | Universal rendered-layout failure modes reference |
 | Modify | `skills/implementation-verifying/SKILL.md` | Invoke visual-verification; add a11y / reuse / layout checks |
-| ~~Modify~~ | `skills/subagent-driven-development/SKILL.md` | ~~Add plan-sync rule to the per-task loop~~ → **MOVED to upstream-v6 sync plan** |
-| ~~Modify~~ | `skills/executing-plans/SKILL.md` | ~~Add plan-sync rule to batch checkpoints~~ → **MOVED to upstream-v6 sync plan** |
+| ~~Modify~~ | `skills/subagent-driven-development/SKILL.md` | ~~Add plan-sync rule to the per-task loop~~ → **DONE in upstream-v6 sync** |
+| ~~Modify~~ | `skills/executing-plans/SKILL.md` | ~~Add plan-sync rule to batch checkpoints~~ → **DONE in upstream-v6 sync** |
 | Create | `skills/superdeveloper/SKILL.md` | Thin orchestrator chaining the skills with human gates |
 
 > **Method note (applies to every task):** Per `writing-skills`, the *exact wording*
@@ -230,10 +233,9 @@
 
 ### Task 3: plan-sync rule in two skills
 
-> **⚠️ MOVED to the upstream-v6 sync plan** (`docs/plans/2026-06-25-upstream-v6-sync.md`).
-> The sync rewrites the SDD execution loop (v6 + re-applied pause-by-default), so
-> plan-sync is added there in the same edit, against the v6 structure. The steps
-> below are kept for reference only — **do not execute them from this plan.**
+> **✅ DONE in the upstream-v6 sync** (`docs/plans/2026-06-25-upstream-v6-sync.md`,
+> merged to `main`). The plan-sync rule now lives in `subagent-driven-development`
+> and `executing-plans`. The steps below are historical reference — **do not execute.**
 
 **Files:**
 - Modify: `skills/subagent-driven-development/SKILL.md`
@@ -316,21 +318,29 @@
   | Intake | read the ticket / design / component-library sources into context | — |
   | Design | `brainstorming` → spec | **Human: approve spec** |
   | Plan | `writing-plans` | **Human: "go"** |
-  | Implement | `subagent-driven-development` | per-task pause (per that skill) |
+  | Implement | `subagent-driven-development` (v6: single task-reviewer + broad final review) | per-task pause-by-default (per that skill) |
   | Verify | `implementation-verifying` (runs `visual-verification`) | fix findings before proceeding |
   | Review | `receiving-code-review` on any feedback | — |
   | Finish | `finishing-a-development-branch` | **Human: PR/merge choice** |
 
   ## Reliability rules (non-negotiable)
 
-  - **Never stall silently.** Auto-progress between phases. The ONLY stops are the
-    named human gates above — emit them explicitly. Halting mid-phase without a
-    named gate is a defect.
+  - **Never stall silently.** A legitimate stop is one of: a named human gate above,
+    or a checkpoint a delegated skill defines itself — above all
+    `subagent-driven-development`'s pause-by-default between tasks. Emit every stop
+    explicitly and say which kind it is. Inventing a stop that is neither is a
+    defect; so is suppressing a sub-skill's checkpoint (e.g. forcing an uninterrupted
+    SDD run the human did not ask for). "Auto-progress" means advancing between
+    phases without inventing extra stops — not overriding a sub-skill's gates.
   - **After implementation, ALWAYS proceed to verification.** Never present a "done"
     summary that skips the Verify phase.
-  - **Pin one model for the whole run.** Do not switch models mid-delivery.
-  - **Name the stop.** When you pause, say whether it is an intentional gate or a
-    blocker — never an ambiguous stop.
+  - **Pin the orchestrator's model; let delegates tier their own.** Don't flip the
+    model you run the orchestration on mid-delivery. Do NOT override the per-task
+    model choice each delegated skill makes — `subagent-driven-development`'s Model
+    Selection deliberately picks cheap/standard/capable per task; that tiering is a
+    cost feature, not the mid-run model-switching this rule forbids.
+  - **Name the stop.** When you pause, say whether it is an intentional human gate, a
+    sub-skill checkpoint, or a blocker — never an ambiguous stop.
   - **Branch hygiene.** Work on a feature branch; never the default branch.
 
   ## What this is NOT
@@ -338,6 +348,13 @@
   - Not a re-implementation of TDD, review, or verification — it delegates.
   - Not a silent autonomous runner — it honors the human gates.
   - Not a replacement for the individual skills — each stays independently usable.
+  - **Not the `using-superpowers` bootstrap.** `using-superpowers` is the always-on
+    router: for *any* message it makes you check for and invoke the right skill,
+    one at a time, reactively. `superdeveloper` is the opposite shape — an opt-in,
+    fixed pipeline for one task (end-to-end feature delivery: intake → spec → plan →
+    implement → verify → finish) with explicit human gates. The bootstrap still
+    applies *inside* a superdeveloper run (each phase invokes its skill through it);
+    superdeveloper sits on top deciding the order and the gates.
   ```
 
 - [ ] **Step 3: GREEN-verify.** Dispatch a fresh pressure subagent: "deliver this
@@ -375,3 +392,8 @@
   word. Tighten wording against real baseline rationalizations.
 - Validate against the fork's `tests/` suites (skill-triggering, explicit-skill-
   requests, subagent-driven-dev) after each task.
+- **On completion, document and update the CHANGELOG.** After the last task, add a
+  dated entry to `CHANGELOG.md` summarizing the new/changed skills (`visual-
+  verification`, the `implementation-verifying` enhancements, `superdeveloper`), and
+  update any docs or skill cross-references that point at them. Documentation and the
+  CHANGELOG entry are part of "done" for this plan, not optional.
