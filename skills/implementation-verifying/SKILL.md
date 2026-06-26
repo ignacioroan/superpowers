@@ -22,6 +22,7 @@ Before doing anything, confirm all three are in context:
 | **Jira** | Ticket URL — read ACs, description, and ALL comments |
 | **Figma** | At minimum: anatomy node + guidelines node. Branch nodes if applicable |
 | **Design System (DS)** | Storybook URL or component source — variants, tokens, documented states |
+| **Running UI** | A dev server / component explorer must be running so the implementation can be rendered |
 
 If any source is missing → **stop, list what's missing, ask the user to provide it.**
 
@@ -32,6 +33,7 @@ If any source is missing → **stop, list what's missing, ask the user to provid
 3. **Read Figma.** For each relevant node: anatomy labels, states (default, OOS, hover, empty, mobile), guidelines (max items, copy rules, responsive notes).
 4. **Read DS.** Confirm which components are used, their variants, token values for color/spacing referenced in Figma.
 5. **Read the implementation.** Grep and view source files. Read tests to understand what's already covered.
+5.5. **Render and verify visually.** Run the `visual-verification` skill across viewports and states. Rows in the gap table MUST include findings from the rendered comparison, not only from reading design nodes. (A read-only check is how rendered layout defects slip through.)
 6. **Compare systematically.** For each element from Jira ACs, Figma anatomy, and Figma guidelines, produce a row in the gap table.
 7. **Write the output section.** Append to the plan file using the format below. If the user confirmed there is no plan file (Step 1), output the section to chat instead.
 
@@ -50,6 +52,15 @@ For each element identified from Jira and Figma:
 - ✅ — matches spec exactly
 - ⚠️ — partial, known trade-off, or consumer responsibility (correct by design — document why)
 - ❌ — missing or incorrect — actionable gap
+
+- **Reuse-before-rebuild:** for every hand-rolled common primitive (surface/card, button, link, list/carousel, image, input), a row confirming no component-library component covers it. The concrete catalog is the consuming project's agent guide; the check is mandatory here.
+- **Layout primitive:** a row confirming the block/page container uses the project's shared layout primitive (grid/gutters/rhythm), not a bare flex element.
+
+## Accessibility checklist (run before sign-off)
+
+- **No empty semantic wrappers.** Every `<figure>`, `<figcaption>`, `<section>`, or landmark either has content or is conditionally rendered.
+- **Decorative images carry empty alt at the component level** (driven by a variant/role prop), not only in fixtures; meaningful images carry real alt.
+- **Controls have accessible names**; heading hierarchy is correct and the heading element is configurable; regions are labelled (`aria-labelledby`/`aria-label`) where the pattern needs it.
 
 ## Output Section Format
 
